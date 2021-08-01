@@ -12,7 +12,7 @@ Version = 4.2.1;
 // Component Tree
 //-------------------------------------------------------
 UNIVERSE {
-    Space Field(0,0),Square_2D(10, 30, Loop, North, 1, !Map_3D){
+    Space Field(0,0),Square_2D(10, 29, Loop, North, 1, Map_3D){
         AgtType Walker(0, 0)[0] {
             Dim ID(0, 0) As Integer = (0);
             Dim X(0, 0) As Double = (0.0);
@@ -27,6 +27,8 @@ UNIVERSE {
             Dim time(0, 0) As Integer = (0);
             Dim X_seat(0, 0) As Integer = (0);
             Dim Y_seat(0, 0) As Integer = (0);
+            Dim Z(0, 0) As Double = ();
+            Dim Angle(0, 0) As Double = ();
         }
     }
     Dim Scenario(0, 0) As String = ("");
@@ -44,6 +46,7 @@ UNIVERSE {
     Dim X(0, 0) As Double = (0.0);
     Dim Y(0, 0) As Double = (0.0);
     Dim Counter(0, 0) As Double = (0.0);
+    Dim Z(0, 0) As Double = ();
 }
 
 
@@ -54,13 +57,13 @@ Initial_Value {
     UNIVERSE.SCENARIO = 1("SEIR_02");
     UNIVERSE.POPULATION = 1(70);
     UNIVERSE.POP_INOUT = 1(0);
-    UNIVERSE.INITIAL_INFECTED = 1(4.0);
-    UNIVERSE.INFECTION_RATE = 1(0.52);
+    UNIVERSE.INITIAL_INFECTED = 1(7.0);
+    UNIVERSE.INFECTION_RATE = 1(1.0);
     UNIVERSE.INCUBATION_PERIOD = 1(100);
     UNIVERSE.INFECTION_PERIOD = 1(100);
     UNIVERSE.IMMUNE_PERIOD = 1(1);
     UNIVERSE.SPEED = 1(0.5);
-    UNIVERSE.INITIAL_WAKUTIN = 1(10.0);
+    UNIVERSE.INITIAL_WAKUTIN = 1(61.0);
 }
 
 
@@ -256,13 +259,9 @@ Agt_Step{//1ステップ1分で考えている
 	end if	
 
 //試合後も動かしたい
-if My.time >= 110 and My.time <= 115 Then
-			Turn(180)
-			Forward(Universe.Speed)
-			if my.time == 115 then 
+  if my.time == 115 then 
 				ExitSimulation()
-			end if	
-	End if
+	end if	
 	
 	//Condition_Adjustment
 	MakeAllAgtsetAroundOwn(Neighbors, 1, False)
@@ -379,21 +378,18 @@ if My.time >= 110 and My.time <= 115 Then
 			My.Counter = My.Counter+1	//感染期間を数える
 			For Each One in Neighbors	//感染させる
 				If One.Condition == 0 and Rnd() < Universe.Infection_Rate Then
-//					If Universe.Incubation_Period <> 0	Then	//潜伏期間が0でないときは潜伏感染者になる
 						One.Condition = 3
 						One.RN = 0			
 						My.RN = My.RN + 1
-//					Else										//潜伏期間が0のときはすぐに感染者にする
-//						One.Condittion = 1
-//						One.RN = 0
-//						One.Counter = 0
-//					End if
+						
+				Elseif	My.Condition == 4	and Rnd() < Universe.Infection_Rate*0.05 Then
+//		 			If Universe.Incubation_Period <> 0	Then	//潜伏期間が0でないときは潜伏感染者になる(潜伏期間はコントロールパラメータで調整できる)
+						One.Condition = 3//潜伏感染者になる
+						One.RN = 0
+						My.RN = My.RN + 1
 				End if
 			Next One
-//			If	1/Universe.Infection_Period > Rnd()	Then	//回復する
-//					My.Condition = 2
-//					My.Counter = 0
-//			End if
+			
 		Elseif	My.Condition == 3	Then	//潜伏感染者のとき（感染性のある感染者）
 			My.Counter = My.Counter+1	//感染期間を数える
 			For Each One in Neighbors	//感染させる
@@ -401,18 +397,16 @@ if My.time >= 110 and My.time <= 115 Then
 					One.Condition = 3
 					One.RN = 0
 					My.RN = My.RN + 1
+	
+				Elseif	My.Condition == 4	and Rnd() < Universe.Infection_Rate*0.05 Then
+//		 			If Universe.Incubation_Period <> 0	Then	//潜伏期間が0でないときは潜伏感染者になる(潜伏期間はコントロールパラメータで調整できる)
+						One.Condition = 3//潜伏感染者になる
+						One.RN = 0
+						My.RN = My.RN + 1
 				End if
 			Next One
-			//短時間なので発症も回復もしないことにする
-////			If	1/Universe.Incubation_Period > Rnd()	Then	//発症する
-////					My.Condition = 1
-////					My.Counter = 0
-////			End if
-//			If	1/Universe.Infection_Period > Rnd()	Then	//回復する
-//					My.Condition = 2
-//					My.Counter = 0
-//			End if
-		End if	
+	End if	
+		
 	Elseif	Universe.Scenario == "SIRS"		Then
 		If 		My.Condition == 0	Then	//健康なとき
 
@@ -461,7 +455,7 @@ Single_Simulation {
     Step_Max = 700;
     Time_Max = 0;
     End_Condition = "";
-    Exec_Wait = 1000;
+    Exec_Wait = 47;
     Exec_Wait_Max = 1000;
     Random_Generator = Java_Standard;
     Exec_Order = Random;
@@ -493,10 +487,10 @@ Map_Output {
     Title = "";
     Disable = No;
     Background_Color = 255, 255, 255;
-    Position_x = 365;
-    Position_y = 45;
-    Size_x = 1440;
-    Size_y = 552;
+    Position_x = 506;
+    Position_y = 530;
+    Size_x = 847;
+    Size_y = 582;
     Map_Cell_Size = 5;
     Remarks = Yes;
     Legend_Pos = Top;
@@ -510,7 +504,7 @@ Map_Output {
     Draw_Timing = Simulation_Step;
     Draw_Interval = 1;
     Axis_Label = "", "";
-    Draw_Range = 0, 0, 10, 30;
+    Draw_Range = 0, 0, 10, 29;
     Ruled_Line = Yes;
     Text_Display = No;
     Text_Display_Variable_Name = "Universe.Scenario";
@@ -586,8 +580,8 @@ Time_Graph {
     Remarks = No;
     Legend_Pos = Top;
     FastDraw = No;
-    Position_x = -920;
-    Position_y = 12;
+    Position_x = -86;
+    Position_y = 2;
     Size_x = 1622;
     Size_y = 614;
     Map_Cell_Size = -1;
@@ -678,8 +672,8 @@ Time_Graph {
     Remarks = No;
     Legend_Pos = Top;
     FastDraw = No;
-    Position_x = 72;
-    Position_y = -12;
+    Position_x = 46;
+    Position_y = 189;
     Size_x = 484;
     Size_y = 293;
     Map_Cell_Size = -1;
@@ -705,7 +699,7 @@ Time_Graph {
 // Control Panel Definition Division
 //-------------------------------------------------------
 Control_Panel {
-    Display_Area = 38, 696, 1375, 204;
+    Display_Area = -180, 779, 1375, 100;
     Display_Type = 0;
     Panel_Item {
         Item_Type = Drop_Down_List;
@@ -750,7 +744,7 @@ Control_Panel {
         Slider_Range_Max = 299;
         Slider_Value_Min = 1.0;
         Slider_Value_Step = 1.0;
-        Slider_Value = "3";
+        Slider_Value = "6";
     }
     Panel_Item {
         Item_Type = Slider;
@@ -782,7 +776,7 @@ Control_Panel {
         Slider_Range_Max = 100;
         Slider_Value_Min = 0.0;
         Slider_Value_Step = 0.01;
-        Slider_Value = "52";
+        Slider_Value = "100";
     }
     Panel_Item {
         Item_Type = Slider;
@@ -798,7 +792,7 @@ Control_Panel {
         Slider_Range_Max = 300;
         Slider_Value_Min = 0.0;
         Slider_Value_Step = 1.0;
-        Slider_Value = "10";
+        Slider_Value = "61";
     }
 }
 
