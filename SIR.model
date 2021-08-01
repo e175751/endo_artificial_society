@@ -12,7 +12,7 @@ Version = 4.2.1;
 // Component Tree
 //-------------------------------------------------------
 UNIVERSE {
-    Space Field(0,0),Square_2D(10, 29, Loop, North, 1, Map_3D){
+    Space Field(0,0),Square_2D(11, 30, Loop, North, 1, Map_3D){
         AgtType Walker(0, 0)[0] {
             Dim ID(0, 0) As Integer = (0);
             Dim X(0, 0) As Double = (0.0);
@@ -55,15 +55,15 @@ UNIVERSE {
 //-------------------------------------------------------
 Initial_Value {
     UNIVERSE.SCENARIO = 1("SEIR_02");
-    UNIVERSE.POPULATION = 1(30);
+    UNIVERSE.POPULATION = 1(140);
     UNIVERSE.POP_INOUT = 1(0);
-    UNIVERSE.INITIAL_INFECTED = 1(15.0);
+    UNIVERSE.INITIAL_INFECTED = 1(77.0);
     UNIVERSE.INFECTION_RATE = 1(1.0);
     UNIVERSE.INCUBATION_PERIOD = 1(100);
     UNIVERSE.INFECTION_PERIOD = 1(100);
     UNIVERSE.IMMUNE_PERIOD = 1(1);
     UNIVERSE.SPEED = 1(0.5);
-    UNIVERSE.INITIAL_WAKUTIN = 1(5.0);
+    UNIVERSE.INITIAL_WAKUTIN = 1(63.0);
 }
 
 
@@ -211,8 +211,10 @@ Univ_Finish{
 #begin_rule UNIVERSE.FIELD.WALKER
 Agt_Init{
 
-	My.X = Int(Rnd()*10)//横10席
-	My.Y = Int(Rnd()*29)//縦29席
+	My.X = Int(Rnd()*6)//横10席
+	my.X = 2*my.X
+	My.Y = Int(Rnd()*15)//縦29席
+	my.Y = 2*my.Y
 
 	//周り１セルを見て空いている席に座る
 	MoveToSpaceOwnCell(2)
@@ -364,7 +366,7 @@ Agt_Step{//1ステップ1分で考えている
 						One.RN = 0			
 						My.RN = My.RN + 1
 						
-				Elseif	My.Condition == 4	and Rnd() < Universe.Infection_Rate*0.05 Then
+				Elseif	One.Condition == 4	and Rnd() < Universe.Infection_Rate *0.05 Then
 //		 			If Universe.Incubation_Period <> 0	Then	//潜伏期間が0でないときは潜伏感染者になる(潜伏期間はコントロールパラメータで調整できる)
 						One.Condition = 3//潜伏感染者になる
 						One.RN = 0
@@ -380,7 +382,7 @@ Agt_Step{//1ステップ1分で考えている
 					One.RN = 0
 					My.RN = My.RN + 1
 	
-				Elseif	My.Condition == 4	and Rnd() < Universe.Infection_Rate*0.05 Then
+				Elseif	.Condition == 4	and Rnd() < Universe.Infection_Rate*0.05 Then
 //		 			If Universe.Incubation_Period <> 0	Then	//潜伏期間が0でないときは潜伏感染者になる(潜伏期間はコントロールパラメータで調整できる)
 						One.Condition = 3//潜伏感染者になる
 						One.RN = 0
@@ -423,6 +425,8 @@ Agt_Step{//1ステップ1分で考えている
 			My.Color = RGB(200, 0, 0)
 	Elseif	My.Condition == 2	Then	//免疫保持者（除外者）	
 			My.Color = RGB(0, 0, 200)
+	Elseif	My.Condition == 4	Then	//免疫保持者（除外者）	
+			My.Color = RGB(0,255,255)		
 	End if
 }
 #end_rule UNIVERSE.FIELD.WALKER
@@ -437,7 +441,7 @@ Single_Simulation {
     Step_Max = 700;
     Time_Max = 0;
     End_Condition = "";
-    Exec_Wait = 0;
+    Exec_Wait = 151;
     Exec_Wait_Max = 1000;
     Random_Generator = Java_Standard;
     Exec_Order = Random;
@@ -469,8 +473,8 @@ Map_Output {
     Title = "";
     Disable = No;
     Background_Color = 255, 255, 255;
-    Position_x = 410;
-    Position_y = 2;
+    Position_x = 349;
+    Position_y = 9;
     Size_x = 847;
     Size_y = 582;
     Map_Cell_Size = 5;
@@ -486,7 +490,7 @@ Map_Output {
     Draw_Timing = Simulation_Step;
     Draw_Interval = 1;
     Axis_Label = "", "";
-    Draw_Range = 0, 0, 10, 29;
+    Draw_Range = 0, 0, 11, 30;
     Ruled_Line = Yes;
     Text_Display = No;
     Text_Display_Variable_Name = "Universe.Scenario";
@@ -562,8 +566,8 @@ Time_Graph {
     Remarks = No;
     Legend_Pos = Top;
     FastDraw = No;
-    Position_x = -159;
-    Position_y = 159;
+    Position_x = -162;
+    Position_y = 73;
     Size_x = 1542;
     Size_y = 617;
     Map_Cell_Size = -1;
@@ -681,7 +685,7 @@ Time_Graph {
 // Control Panel Definition Division
 //-------------------------------------------------------
 Control_Panel {
-    Display_Area = 65, 691, 1375, 100;
+    Display_Area = 0, 753, 1375, 147;
     Display_Type = 0;
     Panel_Item {
         Item_Type = Drop_Down_List;
@@ -698,7 +702,7 @@ Control_Panel {
     }
     Panel_Item {
         Item_Type = Slider;
-        Item_Name = "人口";
+        Item_Name = "観戦客数";
         Display_Area = 0, 0, 0, 0;
         Font_Name = "";
         Font_Char_Set = 0;
@@ -710,7 +714,7 @@ Control_Panel {
         Slider_Range_Max = 300;
         Slider_Value_Min = 0.0;
         Slider_Value_Step = 10.0;
-        Slider_Value = "3";
+        Slider_Value = "14";
     }
     Panel_Item {
         Item_Type = Slider;
@@ -726,7 +730,7 @@ Control_Panel {
         Slider_Range_Max = 299;
         Slider_Value_Min = 1.0;
         Slider_Value_Step = 1.0;
-        Slider_Value = "14";
+        Slider_Value = "76";
     }
     Panel_Item {
         Item_Type = Slider;
@@ -774,7 +778,7 @@ Control_Panel {
         Slider_Range_Max = 300;
         Slider_Value_Min = 0.0;
         Slider_Value_Step = 1.0;
-        Slider_Value = "5";
+        Slider_Value = "63";
     }
 }
 
