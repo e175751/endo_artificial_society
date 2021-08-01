@@ -55,15 +55,15 @@ UNIVERSE {
 //-------------------------------------------------------
 Initial_Value {
     UNIVERSE.SCENARIO = 1("SEIR_02");
-    UNIVERSE.POPULATION = 1(70);
+    UNIVERSE.POPULATION = 1(30);
     UNIVERSE.POP_INOUT = 1(0);
-    UNIVERSE.INITIAL_INFECTED = 1(7.0);
+    UNIVERSE.INITIAL_INFECTED = 1(15.0);
     UNIVERSE.INFECTION_RATE = 1(1.0);
     UNIVERSE.INCUBATION_PERIOD = 1(100);
     UNIVERSE.INFECTION_PERIOD = 1(100);
     UNIVERSE.IMMUNE_PERIOD = 1(1);
     UNIVERSE.SPEED = 1(0.5);
-    UNIVERSE.INITIAL_WAKUTIN = 1(61.0);
+    UNIVERSE.INITIAL_WAKUTIN = 1(5.0);
 }
 
 
@@ -211,31 +211,14 @@ Univ_Finish{
 #begin_rule UNIVERSE.FIELD.WALKER
 Agt_Init{
 
-//やりたいこと,被りをなくす
+	My.X = Int(Rnd()*10)//横10席
+	My.Y = Int(Rnd()*29)//縦29席
 
-//感染者とワクチン接種者が初めにプロットされるので、足した人数文はランダム(奇数列)に配置させる
-if Universe.Initial_Infected + Universe.Initial_Wakutin > Universe.Counter then 
-	My.X = Int(Rnd()*5)//奇数にする
-	My.X = 2*My.X-1
-	My.Y = Int(Rnd()*15)
-	My.Y = 2*My.Y-1
-
-	my.X_seat = my.X
+	//周り１セルを見て空いている席に座る
+	MoveToSpaceOwnCell(2)
+	//座席の記憶
+	my.X_seat = my.X 
 	my.Y_seat = my.Y
-	Universe.Counter = Universe.Counter+1
-//健康者は規則的に配置させる
-else
-My.X = Universe.X
-My.Y = Universe.Y		
-
-my.X_seat = my.X
-my.Y_seat = my.Y
-Universe.X = Universe.X + 2
-	if Universe.X == 12 Then
-		Universe.Y = Universe.Y + 2
-		Universe.X = 0
-	end if
-end	 if
 
 }
 
@@ -249,8 +232,7 @@ Agt_Step{//1ステップ1分で考えている
 //試合中は動かず、ハーフタイムで動着回る
 	My.time = My.time + 1
 	if My.time >= 46 and My.time <= 60 Then
-			Turn(60*(Rnd() - 0.5))
-			Forward(Universe.Speed)
+			MoveToSpaceOwnCell(1)
 	End if
 //	ハールタイムが終わったら元の席に戻る
 	if my.time >= 61 then
@@ -455,7 +437,7 @@ Single_Simulation {
     Step_Max = 700;
     Time_Max = 0;
     End_Condition = "";
-    Exec_Wait = 47;
+    Exec_Wait = 0;
     Exec_Wait_Max = 1000;
     Random_Generator = Java_Standard;
     Exec_Order = Random;
@@ -487,8 +469,8 @@ Map_Output {
     Title = "";
     Disable = No;
     Background_Color = 255, 255, 255;
-    Position_x = 506;
-    Position_y = 530;
+    Position_x = 410;
+    Position_y = 2;
     Size_x = 847;
     Size_y = 582;
     Map_Cell_Size = 5;
@@ -580,10 +562,10 @@ Time_Graph {
     Remarks = No;
     Legend_Pos = Top;
     FastDraw = No;
-    Position_x = -86;
-    Position_y = 2;
-    Size_x = 1622;
-    Size_y = 614;
+    Position_x = -159;
+    Position_y = 159;
+    Size_x = 1542;
+    Size_y = 617;
     Map_Cell_Size = -1;
     Axis_Label = "", "";
     Draw_By_JFree_Chart = Yes;
@@ -699,7 +681,7 @@ Time_Graph {
 // Control Panel Definition Division
 //-------------------------------------------------------
 Control_Panel {
-    Display_Area = -180, 779, 1375, 100;
+    Display_Area = 65, 691, 1375, 100;
     Display_Type = 0;
     Panel_Item {
         Item_Type = Drop_Down_List;
@@ -728,7 +710,7 @@ Control_Panel {
         Slider_Range_Max = 300;
         Slider_Value_Min = 0.0;
         Slider_Value_Step = 10.0;
-        Slider_Value = "7";
+        Slider_Value = "3";
     }
     Panel_Item {
         Item_Type = Slider;
@@ -744,7 +726,7 @@ Control_Panel {
         Slider_Range_Max = 299;
         Slider_Value_Min = 1.0;
         Slider_Value_Step = 1.0;
-        Slider_Value = "6";
+        Slider_Value = "14";
     }
     Panel_Item {
         Item_Type = Slider;
@@ -792,7 +774,7 @@ Control_Panel {
         Slider_Range_Max = 300;
         Slider_Value_Min = 0.0;
         Slider_Value_Step = 1.0;
-        Slider_Value = "61";
+        Slider_Value = "5";
     }
 }
 
